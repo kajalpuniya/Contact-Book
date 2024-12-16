@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+        /* Existing styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #35424a;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+
+        .logout-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #35424a;
+            color: white;
+        }
+
+        .edit-button, .delete-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .edit-button {
+            background-color: #3498db;
+        }
+
+        .delete-button {
+            background-color: #e74c3c;
+        }
+
+        .edit-button:hover {
+            background-color: #2980b9;
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <button class="logout-button" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="main-content">
+        <div class="card">
+            <h2>Welcome, Admin!</h2>
+            <p>This is your dashboard where you can manage users, view reports, and adjust settings.</p>
+        </div>
+        
+       
+        <div class="card">
+            <h3>User Management</h3>
+            <p>Here you can add, edit, or remove users from the system.</p>
+            <button onclick="manageUsers()">Manage Users</button>
+            <div id="userTableContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            alert("Logging out...");
+            window.location.href = 'register.jsp'; 
+        }
+
+        function manageUsers() {
+           
+            fetchUsers();
+        }
+
+        function fetchUsers() {
+            fetch('gettUsers.jsp') 
+                .then(response => response.json())
+                .then(data => {
+                    displayUsers(data);
+                })
+                .catch(error => console.error('Error fetching users:', error));
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById('userTableContainer');
+            let tableHTML = `
+                <table>
+                    <tr> 
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Gender</th>
+                       
+                        <th>Actions</th>
+                    </tr>`;
+            users.forEach(user => {
+                tableHTML += `
+                    <tr>
+                        <td>${user.fullName}</td>
+                        <td>${user.email}</td>
+                        <td>${user.mobile}</td>
+                        <td>${user.gender}</td>
+                      
+                        <td>
+                            <button class="edit-button" data-user='${JSON.stringify(user)}' onclick="editUser(this)">Edit</button>
+                            <button class="delete-button" data-user='${JSON.stringify(user)}' onclick="deleteUser(this)">Delete</button>
+                            <button class="view-button" data-user='${JSON.stringify(user)}' onclick="viewUser(this)">view</button>
+                        </td>
+                    </tr>`;
+            });
+            tableHTML += `</table>`;
+            container.innerHTML = tableHTML;
+        }
+
+        function editUser(button) {
+            const user = JSON.parse(button.getAttribute('data-user'));
+         
+            window.location.href = `editUser.jsp?email=${encodeURIComponent(user.email)}`;
+        }
+
+
+        function deleteUser(button) {
+            const user = JSON.parse(button.getAttribute('data-user'));
+            const confirmDelete = confirm(`Are you sure you want to delete ${user.fullName}?`);
+            if (confirmDelete) {
+              
+                fetch(`deleteUser.jsp?email=${encodeURIComponent(user.email)}`, {
+                    method: 'GET'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("User deleted successfully!");
+                        fetchUsers(); 
+                    } else {
+                        alert("Failed to delete user.");
+                    }
+                })
+                .catch(error => console.error('Error deleting user:', error));
+            }
+        }
+        
+        
+        
+        
+       
+
+        
+        function viewUser(button) {
+            const user = JSON.parse(button.getAttribute('data-user'));
+            const url = `viewUser.jsp?fullName=${encodeURIComponent(user.fullName)}&email=${encodeURIComponent(user.email)}&mobile=${encodeURIComponent(user.mobile)}&gender=${encodeURIComponent(user.gender)}&photo=${encodeURIComponent(user.photo)}`;
+            window.location.href = url;
+        }
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+    </script>
+   
+</body>
+</html>
