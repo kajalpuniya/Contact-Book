@@ -43,7 +43,9 @@ The backend is developed in **Java**, the database is **PostgreSQL**, and the ap
 ---
 
 ### Steps to Run the Application
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/<your-username>/<repository-name>.git
-   cd <repository-name>
+https://github.com/kajalpuniya/Contact-Book.git
+
+
+
+
+
